@@ -1,0 +1,4 @@
+* ef105a9 (HEAD -> main) Add collector output sample
+* 4f96fdc Implement system health collection and report output
+* bd60b11 Add shebang and syshealth script header
+* 596c03d Initial commit: project skeleton and README

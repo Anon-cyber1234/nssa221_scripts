@@ -1,0 +1,14 @@
+* 0d927c4 (HEAD -> main) Implement run_health_checks, parse_arguments, generate_report and update main()
+* 6d218d2 Create check_disk_usage, check_memory_usage, and check_cpu_usage functions with return codes
+* 470b458 Extract print_status with local variables
+* bd7c130 Add main() function and basic script structure
+* b145112 Add for-loop over multiple mount points and update exit code handling
+* 6964098 Add parsing and conditional checks for disk, memory, and CPU
+* 99a1bb1 Implement print_status function with color-coded output
+* 00a7c8f Add threshold variables for CPU, MEM, and DISK
+| * 349c46f (lab2-backup) Add threshold variables for CPU, MEM, and DISK
+|/  
+* ef105a9 Add collector output sample
+* 4f96fdc Implement system health collection and report output
+* bd60b11 Add shebang and syshealth script header
+* 596c03d Initial commit: project skeleton and README

@@ -1,0 +1,8 @@
+========================================
+System Health Report - 2026-09-18 13:04:07
+Hostname : Yarins-MacBook-Pro-9.local
+Uptime : 
+Disk / : /dev/disk3s1s1   228Gi    16Gi    36Gi    31%    459k  374M    0%   /
+Memory used : 
+Total processes :      600
+========================================
