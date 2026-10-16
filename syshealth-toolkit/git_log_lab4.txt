@@ -1,0 +1,10 @@
+* 5d7e8f4 (HEAD -> main, origin/main, origin/HEAD) Add graceful missing -log handling and update documentation
+* 33f22b5 Integrate log analysis summary into generate_report()
+* a2eaf5b Implement sed + sort|uniq|head pipeline for top 5 recurring issues
+* 7955ddf Add analyze_logs function with grep -E regex and counts
+* da82aae Add Lab 3 system health toolkit files
+* 9762cec Add Lab 3 system health toolkit
+*   e835e02 Merge branch 'main' of https://github.com/Anon-cyber1234/nssa221_scripts
+|\  
+| * a454be4 Initial commit
+* 6b98977 adding ping_test to repository.
