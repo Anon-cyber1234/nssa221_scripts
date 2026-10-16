@@ -1,0 +1,17 @@
+========================================
+System Health Report - 2026-10-16 13:19:46
+Hostname : localhost.localdomain
+Uptime : up 7 hours, 6 minutes
+Disk / : /dev/mapper/rl-root   36G  5.3G   30G  15% /
+Memory used : 3.0Gi/7.5Gi
+Total processes : 329
+Health status : HEALTHY
+========================================
+
+========================================
+LOG ANALYSIS SUMMARY
+========================================
+
+Log Analysis Summary (messages):
+ Log file not readable or does not exist on this system.
+ (This is normal in some containers or minimal installs.)
