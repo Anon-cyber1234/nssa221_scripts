@@ -177,7 +177,8 @@ generate_report() {
         printf "Health status : UNHEALTHY - see alerts above\n"
     fi
 
-    printf "========================================\n"
+   printf "========================================\n"
+
     printf "\n========================================\n"
     printf "LOG ANALYSIS SUMMARY\n"
     printf "========================================\n"
