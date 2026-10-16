@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ===============================================
 # syshealth.sh - System Health & Log Analysis Toolkit
-# Lab 3 - Refactoring into Functions
+# Lab 4 - Log Analysis Integration
 # Author: Yarin Tellez
-# Date: 2026-10-03
+# Date: 2026-10-16
 # ===============================================
 
 # --- Thresholds (global, used by multiple functions) ---
@@ -129,14 +129,16 @@ analyze_logs() {
     warnings=$(grep -E -i 'WARNING|Warning|warning' "$log_file" 2>/dev/null | wc -l)
     failed_logins=$(grep -E -i 'Failed password|authentication failure|Failed login' "$log_file" 2>/dev/null | wc -l)
 
-    # Top 5 recurring issues
     printf "\nTop 5 recurring issues:\n"
-    grep -E -i 'ERROR|Error|error|WARNING|Warning|warning|Failed password|authentication failure' "$log_file" 2>/dev/null \
+
+    top_issues=$(grep -E -i 'ERROR|Error|error|WARNING|Warning|warning|Failed password|authentication failure|Failed login' "$log_file" 2>/dev/null \
         | sed 's/.*\]: //' \
         | sort \
         | uniq -c \
         | sort -nr \
-        | head -5
+        | head -5)
+
+    printf "%s\n" "$top_issues"
 
     # Summary
     printf "\nLog Analysis Summary (%s):\n" "$(basename "$log_file")"
