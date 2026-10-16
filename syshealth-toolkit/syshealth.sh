@@ -116,7 +116,8 @@ analyze_logs() {
     local failed_logins=0
     local top_issues
 
-    # Graceful handling if log file is missing or unreadable
+    # Gracefully handle missing or unreadable log files without crashing
+
     if [ ! -r "$log_file" ]; then
         printf "\nLog Analysis Summary (%s):\n" "$(basename "$log_file")"
         printf " Log file not readable or does not exist on this system.\n"
@@ -177,8 +178,9 @@ generate_report() {
         printf "Health status : UNHEALTHY - see alerts above\n"
     fi
 
-   printf "========================================\n"
+    printf "========================================\n"
 
+    # --NEW: log analysis summary (integrated into every report) ---
     printf "\n========================================\n"
     printf "LOG ANALYSIS SUMMARY\n"
     printf "========================================\n"
