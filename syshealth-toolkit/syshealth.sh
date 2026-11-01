@@ -28,6 +28,36 @@ log_message()
 	echo "$timestamp [$level] $message" >> "$log_file"
 }
 
+generate_report()
+{
+	local CURRENT_DATE HOSTNAME UPTIME DISK_USAGE MEMORY_USAGE PROCESS_COUNT
+
+	CURRENT_DATE=$(date '+%Y-%m-%d %H:%M:+%S')
+	HOSTNAME=$(hostname)
+	UPTIME=$(uptime -p)
+	DISK_USAGE=$(df -h / | tail -1) 
+	MEMORY_USAGE=$(free -h | awk '/Mem:/ {print $3 "/" $2}')
+	PROCESS_COUNT=$(ps -e | wc -l)
+
+	local -a report_metrics
+	report_metrics=(
+		"Hostname: $HOSTNAME"
+		"Uptime: $UPTIME"
+		"Disk /: $DISK_USAGE"
+		"Memory used: $MEMORY_USAGE"
+		"Total Processes: $PROCESS_USAGE"
+		"Health status: $([ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY")"
+	)
+	printf "==============================\n"
+	printf "System Health Report - %s\n" "$CURRENT_DATE"
+	printf " ============================================"
+	
+	for metric in "${report_metrics[@]}"; do
+		printf "%s\n" "$metric"
+	done
+	printf "========================\n"
+}
+
 # --- Color-coded status helper function ---
 print_status() {
     local status="$1"
@@ -35,6 +65,7 @@ print_status() {
 
     if [ "$status" = "OK" ]; then
         echo -e "\e[32m OK: $message\e[0m"
+
     elif [ "$status" = "CHECK" ]; then
         echo -e "\e[33m CHECK: $message\e[0m"
     else
