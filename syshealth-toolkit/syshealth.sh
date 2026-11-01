@@ -56,6 +56,17 @@ generate_report()
 		printf "%s\n" "$metric"
 	done
 	printf "========================\n"
+
+	cat << EOF 
+
+--- End of Report ---
+Script: syshealth.sh (Lab 5 - Errror Handling & Professional Reports)
+Generated: $CURRENT_DATE
+Exit status: ${HEALTH_STATUS:-0} ($( [ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY"))
+Log file: $HOME/.syshealth.log
+===================================
+EOF
+	log_message "INFO" "Report generated sucessfully (exit code ${HEATH_STATUS:-0})"
 }
 
 # --- Color-coded status helper function ---
@@ -139,17 +150,20 @@ run_health_checks() {
     for mount in / /home /var; do
         if ! check_disk_usage "$mount"; then
             overall_status=1
-        fi
+            log_message "ERROR" "Health check alert detected"
+	fi
     done
 
     # Memory check
     if ! check_memory_usage; then
         overall_status=1
+        log_message "ERROR" "Health check alert detected"
     fi
 
     # CPU check
     if ! check_cpu_usage; then
         overall_status=1
+	log_message "ERROR" "Health check alert deteced"
     fi
 
     HEALTH_STATUS="$overall_status"
@@ -194,6 +208,7 @@ analyze_logs() {
     printf " Errors            : %d\n" "$errors"
     printf " Warnings          : %d\n" "$warnings"
     printf " Failed logins     : %d\n" "$failed_logins"
+    log_message "INFO" "Log analysis completed"
 }
 
 # --- Parse command-line arguments ---
@@ -240,11 +255,14 @@ generate_report() {
 main() {
     parse_arguments "$@"
 
+    log_message "INFO" "syshealth.sh started (Lab 5)"
+
     run_health_checks
 
     if [ -n "$OUTPUT_FILE" ]; then
         generate_report > "$OUTPUT_FILE"
         echo "Report written to $OUTPUT_FILE"
+	log_message "INFO" "Report written to $OUTPUT_FILE"
     else
         generate_report
     fi
