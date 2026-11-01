@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 # ===============================================
 # syshealth.sh - System Health & Log Analysis Toolkit
-# Lab 4 - Log Analysis Integration
+# Lab 5 - Error handling, logging & Log Analysis toolkit 
 # Author: Yarin Tellez
-# Date: 2026-10-16
+# Date: 2026-11-01
 # ===============================================
+
+set -euo pipefail
+
+trap 'log_message "ERROR" Script exited unexpectedly with code $?"' ERR
+trap 'log_message "INFO" Script finished normally with $?"' EXIT
 
 # --- Thresholds (global, used by multiple functions) ---
 CPU_THRESHOLD=75
