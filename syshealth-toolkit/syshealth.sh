@@ -8,8 +8,8 @@
 
 set -euo pipefail
 
-trap 'log_message "ERROR" Script exited unexpectedly with code $?"' ERR
-trap 'log_message "INFO" Script finished normally with $?"' EXIT
+trap 'log_message "ERROR" "Script exited unexpectedly with code $?"' ERR
+trap 'log_message "INFO" "Script finished normally with $?"' EXIT
 
 # --- Thresholds (global, used by multiple functions) ---
 CPU_THRESHOLD=75
@@ -45,17 +45,22 @@ generate_report()
 		"Uptime: $UPTIME"
 		"Disk /: $DISK_USAGE"
 		"Memory used: $MEMORY_USAGE"
-		"Total Processes: $PROCESS_USAGE"
+		"Total Processes: $PROCESS_COUNT"
 		"Health status: $([ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY")"
 	)
 	printf "==============================\n"
 	printf "System Health Report - %s\n" "$CURRENT_DATE"
-	printf " ============================================"
+	printf " ============================================\n"
 	
 	for metric in "${report_metrics[@]}"; do
 		printf "%s\n" "$metric"
 	done
 	printf "========================\n"
+	
+	printf "\n ========================================\n"
+	printf "LOG ANALYSIS SUMMARY\n"
+	printf "\n======================================\n"
+	analyze_logs
 
 	cat << EOF 
 
@@ -216,40 +221,6 @@ parse_arguments() {
     OUTPUT_FILE="${1:-}"
 }
 
-# --- Generate system health report ---
-generate_report() {
-    local CURRENT_DATE HOSTNAME UPTIME DISK_USAGE MEMORY_USAGE PROCESS_COUNT
-
-    CURRENT_DATE=$(date '+%Y-%m-%d %H:%M:%S')
-    HOSTNAME=$(hostname)
-    UPTIME=$(uptime -p)
-    DISK_USAGE=$(df -h / | tail -1)
-    MEMORY_USAGE=$(free -h | awk '/Mem:/ {print $3 "/" $2}')
-    PROCESS_COUNT=$(ps -e | wc -l)
-
-    printf "========================================\n"
-    printf "System Health Report - %s\n" "$CURRENT_DATE"
-    printf "Hostname : %s\n" "$HOSTNAME"
-    printf "Uptime : %s\n" "$UPTIME"
-    printf "Disk / : %s\n" "$DISK_USAGE"
-    printf "Memory used : %s\n" "$MEMORY_USAGE"
-    printf "Total processes : %s\n" "$PROCESS_COUNT"
-
-    if [ "${HEALTH_STATUS:-0}" -eq 0 ]; then
-        printf "Health status : HEALTHY\n"
-    else
-        printf "Health status : UNHEALTHY - see alerts above\n"
-    fi
-
-    printf "========================================\n"
-
-    # --NEW: log analysis summary (integrated into every report) ---
-    printf "\n========================================\n"
-    printf "LOG ANALYSIS SUMMARY\n"
-    printf "========================================\n"
-    analyze_logs
-    
-}
 
 # --- Main function ---
 main() {

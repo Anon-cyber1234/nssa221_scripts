@@ -1,0 +1,16 @@
+* 07cb85c (HEAD -> main) Rewrite generate_report with here-document footer and add logging calls'
+* d65106c add array (local a) for report_metrics and populate in generate_report
+* 7898f73 implement log_message function with timestamped append to ~/.syshealth.log
+* 6bacd16 Add strict mode set -euo pipefail and trap handlers for ERR/EXIT
+* fad149a (origin/main, origin/HEAD) add lab4 log summary
+* 8215d7c Add lab 4 submission files" git push
+* 5d7e8f4 Add graceful missing -log handling and update documentation
+* 33f22b5 Integrate log analysis summary into generate_report()
+* a2eaf5b Implement sed + sort|uniq|head pipeline for top 5 recurring issues
+* 7955ddf Add analyze_logs function with grep -E regex and counts
+* da82aae Add Lab 3 system health toolkit files
+* 9762cec Add Lab 3 system health toolkit
+*   e835e02 Merge branch 'main' of https://github.com/Anon-cyber1234/nssa221_scripts
+|\  
+| * a454be4 Initial commit
+* 6b98977 adding ping_test to repository.
