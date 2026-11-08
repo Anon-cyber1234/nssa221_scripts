@@ -9,7 +9,7 @@
 set -euo pipefail
 
 trap 'log_message "ERROR" "Script exited unexpectedly with code $?"' ERR
-trap 'log_message "INFO" "Script finished normally with $?"' EXIT
+trap 'log_message "INFO" "Script finished normally with code $?"' EXIT
 
 # --- Thresholds (global, used by multiple functions) ---
 CPU_THRESHOLD=75
@@ -32,7 +32,7 @@ generate_report()
 {
 	local CURRENT_DATE HOSTNAME UPTIME DISK_USAGE MEMORY_USAGE PROCESS_COUNT
 
-	CURRENT_DATE=$(date '+%Y-%m-%d %H:%M:+%S')
+	CURRENT_DATE=$(date '+%Y-%m-%d %H:%M:%S')
 	HOSTNAME=$(hostname)
 	UPTIME=$(uptime -p)
 	DISK_USAGE=$(df -h / | tail -1) 
@@ -65,13 +65,13 @@ generate_report()
 	cat << EOF 
 
 --- End of Report ---
-Script: syshealth.sh (Lab 5 - Errror Handling & Professional Reports)
+Script: syshealth.sh (Lab 5 - Error Handling & Professional Reports)
 Generated: $CURRENT_DATE
 Exit status: ${HEALTH_STATUS:-0} ($( [ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY"))
 Log file: $HOME/.syshealth.log
 ===================================
 EOF
-	log_message "INFO" "Report generated sucessfully (exit code ${HEATH_STATUS:-0})"
+	log_message "INFO" "Report generated successfully (exit code ${HEALTH_STATUS:-0})"
 }
 
 # --- Color-coded status helper function ---
@@ -189,6 +189,7 @@ analyze_logs() {
         printf "\nLog Analysis Summary (%s):\n" "$(basename "$log_file")"
         printf " Log file not readable or does not exist on this system.\n"
         printf " (This is normal in some containers or minimal installs.)\n"
+        log_message "INFO" "Log analysis completed - $log_file unavailable"
         return 0
     fi
 
