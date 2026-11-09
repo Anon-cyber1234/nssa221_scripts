@@ -1,15 +1,78 @@
 #!/usr/bin/env bash
 # ===============================================
 # syshealth.sh - System Health & Log Analysis Toolkit
-# Lab 4 - Log Analysis Integration
+# Lab 5 - Error handling, logging & Log Analysis toolkit 
 # Author: Yarin Tellez
-# Date: 2026-10-16
+# Date: 2026-11-01
 # ===============================================
+
+set -euo pipefail
+
+trap 'log_message "ERROR" "Script exited unexpectedly with code $?"' ERR
+trap 'log_message "INFO" "Script finished normally with code $?"' EXIT
 
 # --- Thresholds (global, used by multiple functions) ---
 CPU_THRESHOLD=75
 MEM_THRESHOLD=85
 DISK_THRESHOLD=85
+
+log_message()
+{
+	local level="$1"
+	local message="$2"
+	local log_file="$HOME/.syshealth.log"
+	local timestamp
+
+	timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+	mkdir -p "$(dirname "$log_file")"
+	echo "$timestamp [$level] $message" >> "$log_file"
+}
+
+generate_report()
+{
+	local CURRENT_DATE HOSTNAME UPTIME DISK_USAGE MEMORY_USAGE PROCESS_COUNT
+
+	CURRENT_DATE=$(date '+%Y-%m-%d %H:%M:%S')
+	HOSTNAME=$(hostname)
+	UPTIME=$(uptime -p)
+	DISK_USAGE=$(df -h / | tail -1) 
+	MEMORY_USAGE=$(free -h | awk '/Mem:/ {print $3 "/" $2}')
+	PROCESS_COUNT=$(ps -e | wc -l)
+
+	local -a report_metrics
+	report_metrics=(
+		"Hostname: $HOSTNAME"
+		"Uptime: $UPTIME"
+		"Disk /: $DISK_USAGE"
+		"Memory used: $MEMORY_USAGE"
+		"Total Processes: $PROCESS_COUNT"
+		"Health status: $([ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY")"
+	)
+	printf "==============================\n"
+	printf "System Health Report - %s\n" "$CURRENT_DATE"
+	printf " ============================================\n"
+	
+	for metric in "${report_metrics[@]}"; do
+		printf "%s\n" "$metric"
+	done
+	printf "========================\n"
+	
+	printf "\n ========================================\n"
+	printf "LOG ANALYSIS SUMMARY\n"
+	printf "\n======================================\n"
+	analyze_logs
+
+	cat << EOF 
+
+--- End of Report ---
+Script: syshealth.sh (Lab 5 - Error Handling & Professional Reports)
+Generated: $CURRENT_DATE
+Exit status: ${HEALTH_STATUS:-0} ($( [ "${HEALTH_STATUS:-0}" -eq 0 ] && echo "HEALTHY" || echo "UNHEALTHY"))
+Log file: $HOME/.syshealth.log
+===================================
+EOF
+	log_message "INFO" "Report generated successfully (exit code ${HEALTH_STATUS:-0})"
+}
 
 # --- Color-coded status helper function ---
 print_status() {
@@ -18,6 +81,7 @@ print_status() {
 
     if [ "$status" = "OK" ]; then
         echo -e "\e[32m OK: $message\e[0m"
+
     elif [ "$status" = "CHECK" ]; then
         echo -e "\e[33m CHECK: $message\e[0m"
     else
@@ -91,17 +155,20 @@ run_health_checks() {
     for mount in / /home /var; do
         if ! check_disk_usage "$mount"; then
             overall_status=1
-        fi
+            log_message "ERROR" "Health check alert detected"
+	fi
     done
 
     # Memory check
     if ! check_memory_usage; then
         overall_status=1
+        log_message "ERROR" "Health check alert detected"
     fi
 
     # CPU check
     if ! check_cpu_usage; then
         overall_status=1
+	log_message "ERROR" "Health check alert deteced"
     fi
 
     HEALTH_STATUS="$overall_status"
@@ -122,6 +189,7 @@ analyze_logs() {
         printf "\nLog Analysis Summary (%s):\n" "$(basename "$log_file")"
         printf " Log file not readable or does not exist on this system.\n"
         printf " (This is normal in some containers or minimal installs.)\n"
+        log_message "INFO" "Log analysis completed - $log_file unavailable"
         return 0
     fi
 
@@ -146,6 +214,7 @@ analyze_logs() {
     printf " Errors            : %d\n" "$errors"
     printf " Warnings          : %d\n" "$warnings"
     printf " Failed logins     : %d\n" "$failed_logins"
+    log_message "INFO" "Log analysis completed"
 }
 
 # --- Parse command-line arguments ---
@@ -153,50 +222,19 @@ parse_arguments() {
     OUTPUT_FILE="${1:-}"
 }
 
-# --- Generate system health report ---
-generate_report() {
-    local CURRENT_DATE HOSTNAME UPTIME DISK_USAGE MEMORY_USAGE PROCESS_COUNT
-
-    CURRENT_DATE=$(date '+%Y-%m-%d %H:%M:%S')
-    HOSTNAME=$(hostname)
-    UPTIME=$(uptime -p)
-    DISK_USAGE=$(df -h / | tail -1)
-    MEMORY_USAGE=$(free -h | awk '/Mem:/ {print $3 "/" $2}')
-    PROCESS_COUNT=$(ps -e | wc -l)
-
-    printf "========================================\n"
-    printf "System Health Report - %s\n" "$CURRENT_DATE"
-    printf "Hostname : %s\n" "$HOSTNAME"
-    printf "Uptime : %s\n" "$UPTIME"
-    printf "Disk / : %s\n" "$DISK_USAGE"
-    printf "Memory used : %s\n" "$MEMORY_USAGE"
-    printf "Total processes : %s\n" "$PROCESS_COUNT"
-
-    if [ "${HEALTH_STATUS:-0}" -eq 0 ]; then
-        printf "Health status : HEALTHY\n"
-    else
-        printf "Health status : UNHEALTHY - see alerts above\n"
-    fi
-
-    printf "========================================\n"
-
-    # --NEW: log analysis summary (integrated into every report) ---
-    printf "\n========================================\n"
-    printf "LOG ANALYSIS SUMMARY\n"
-    printf "========================================\n"
-    analyze_logs
-    
-}
 
 # --- Main function ---
 main() {
     parse_arguments "$@"
+
+    log_message "INFO" "syshealth.sh started (Lab 5)"
 
     run_health_checks
 
     if [ -n "$OUTPUT_FILE" ]; then
         generate_report > "$OUTPUT_FILE"
         echo "Report written to $OUTPUT_FILE"
+	log_message "INFO" "Report written to $OUTPUT_FILE"
     else
         generate_report
     fi
