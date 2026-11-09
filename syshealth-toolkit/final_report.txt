@@ -1,0 +1,26 @@
+==============================
+System Health Report - 2026-11-09 14:56:15
+ ============================================
+Hostname: localhost.localdomain
+Uptime: up 1 day, 9 hours, 2 minutes
+Disk /: /dev/mapper/rl-root   36G  5.3G   30G  15% /
+Memory used: 2.7Gi/7.5Gi
+Total Processes: 334
+Health status: HEALTHY
+========================
+
+ ========================================
+LOG ANALYSIS SUMMARY
+
+======================================
+
+Log Analysis Summary (messages):
+ Log file not readable or does not exist on this system.
+ (This is normal in some containers or minimal installs.)
+
+--- End of Report ---
+Script: syshealth.sh (Lab 5 - Error Handling & Professional Reports)
+Generated: 2026-11-09 14:56:15
+Exit status: 0 (HEALTHY)
+Log file: /home/student/.syshealth.log
+===================================
