@@ -363,19 +363,14 @@ run_mode() {
 main() {
     parse_arguments "$@"
 
-    log_message "INFO" "syshealth.sh started (Lab 5)"
+    log_message "INFO" "syshealth.sh started in mode: ${MODE:-report}"
 
-    run_health_checks
+    run_mode
 
-    if [ -n "$OUTPUT_FILE" ]; then
-        generate_report > "$OUTPUT_FILE"
-        echo "Report written to $OUTPUT_FILE"
-	log_message "INFO" "Report written to $OUTPUT_FILE"
-    else
-        generate_report
+    # For monitor/analyze modes
+    if [ "${MODE:-report}" != "report" ]; then
+        exit "${HEALTH_STATUS:-0}"
     fi
-
-    exit "${HEALTH_STATUS:-0}"
 }
 
 # Start the script
