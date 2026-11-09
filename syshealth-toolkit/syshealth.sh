@@ -219,7 +219,74 @@ analyze_logs() {
 
 # --- Parse command-line arguments ---
 parse_arguments() {
-    OUTPUT_FILE="${1:-}"
+    local opt
+
+    MODE=""
+    OUTPUT_FILE=""
+
+    # Reset OPTIND in case the function is called multiple times
+    OPTIND=1
+
+    while getopts ":marhv-:" opt; do
+        case "$opt" in
+            m)
+                MODE="monitor"
+                ;;
+            a)
+                MODE="analyze"
+                ;;
+            r)
+                MODE="report"
+                ;;
+            h)
+                usage
+                ;;
+            v)
+                version
+                ;;
+            -)
+                case "$OPTARG" in
+                    monitor)
+                        MODE="monitor"
+                        ;;
+                    analyze)
+                        MODE="analyze"
+                        ;;
+                    report)
+                        MODE="report"
+                        ;;
+                    help)
+                        usage
+                        ;;
+                    version)
+                        version
+                        ;;
+                    *)
+                        echo "Unknown long option: --$OPTARG" >&2
+                        usage
+                        ;;
+                esac
+                ;;
+            \?)
+                echo "Invalid option: -$OPTARG" >&2
+                usage
+                ;;
+            :)
+                echo "Option -$OPTARG requires an argument." >&2
+                usage
+                ;;
+        esac
+    done
+
+    shift $((OPTIND - 1))
+
+    # Backward-compatible positional output filename
+    if [ -n "${1:-}" ] && [ -z "${OUTPUT_FILE:-}" ]; then
+        OUTPUT_FILE="$1"
+    fi
+
+    # Default mode
+    MODE="${MODE:-report}"
 }
 usage() {
     cat << EOF
